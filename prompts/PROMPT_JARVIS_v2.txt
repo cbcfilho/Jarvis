@@ -192,12 +192,12 @@ Assim ele responde SEMPRE me conhecendo.
   uma <div> CONTÊINER:  divContainer.innerHTML = '<svg viewBox="0 0 1000 540">'+conteudo+'</svg>';
   NUNCA use innerHTML direto no elemento <svg> — em Safari e vários webviews os
   elementos entram no namespace errado e o grafo fica INVISÍVEL.
+  Todo texto variável que entra nessa string (títulos, rótulos, legenda) passa por
+  esc() — veja SEGURANÇA.
 - CELULAR: com 1000×540 fixo, os rótulos ficam com ~5 px numa tela de 390 px. Em telas
   com menos de 600 px de largura, use um viewBox mais alto (ex.: 0 0 600 700), com
   elipse mais alta e nós, rótulos e pulsos ~30% maiores; re-renderize quando a tela
   cruzar esse limite.
-  Todo texto variável que entra nessa string (títulos, rótulos, legenda) passa por
-  esc() — veja SEGURANÇA.
 - INTERAÇÃO: clicar num nó abre um editor (título / área / conteúdo, com Excluir);
   o "+" cria nota nova. Ao salvar, grava no localStorage e re-renderiza o grafo.
 
