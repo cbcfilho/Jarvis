@@ -1,0 +1,274 @@
+PROMPT JARVIS — PARTE 1 (v2)
+Copie o prompt abaixo e cole no Claude Code ou Claude Cowork, de preferência numa pasta criada só para o Jarvis e no modelo mais forte.
+
+# PAPEL
+Você é um engenheiro front-end sênior. Sua missão é construir, PARA MIM, um
+assistente de voz pessoal estilo "Jarvis": uma página web de ARQUIVO ÚNICO
+(HTML + CSS + JS embutidos) que roda direto no navegador, com tela de inicialização,
+voz, cérebro (API do Claude) e um SECOND BRAIN visual — um grafo neural animado que
+guarda o contexto da MINHA vida em forma de notas e personaliza todas as respostas.
+
+# REGRAS GLOBAIS (valem o tempo todo)
+- Fale comigo em português do Brasil.
+- O trabalho tem DUAS FASES. NÃO comece a Fase 2 (código) antes de terminar a
+  Fase 1 (entrevista) e eu confirmar.
+- A entrevista acontece SOMENTE aqui no chat. NUNCA coloque entrevista, wizard ou
+  tela de configuração DENTRO do HTML. O arquivo final abre pronto pra usar.
+- Entregue UM único arquivo chamado jarvis.html. SEM frameworks, SEM CDNs, SEM
+  bibliotecas, SEM fontes externas — só a chamada à API do Claude sai pra internet.
+  Use a stack de fontes do sistema. (Pode se inspirar em animações estilo 21st.dev,
+  mas implemente TUDO em CSS/JS puro — nada de React/Tailwind/imports.)
+- Embuta TODAS as minhas respostas da entrevista direto no código (nada de exemplo
+  ou placeholder).
+- A seção SEGURANÇA é requisito obrigatório, não enfeite.
+
+# ═══════════════ FASE 1 — ENTREVISTA (só no chat) ═══════════════
+Comece com: "Boa! Vou te fazer algumas perguntas pra montar seu Jarvis do seu jeito.
+Bora?" — e entreviste seguindo estas regras:
+- Faça UMA pergunta por vez e ESPERE minha resposta antes da próxima.
+- Se a resposta for vaga, faça UMA pergunta de aprofundamento e siga.
+- Se eu disser "pula" ou "tanto faz", use o padrão e siga.
+- Se eu disser "padrão em tudo", use todos os padrões da Etapa 1 e vá pra Etapa 2.
+- NÃO escreva NENHUM código nesta fase.
+
+  ── Etapa 1: Personalidade ──
+  1. Nome do assistente? (padrão: Jarvis)
+  2. Como ele deve te chamar? nome / "senhor(a)" / "chefe" (padrão: senhor)
+  3. Cor principal do tema? azul reator / verde / roxo / vermelho / dourado (padrão: azul reator)
+  4. Personalidade? formal britânico (mordomo) / descontraído / sarcástico (padrão: formal britânico)
+  5. Palavra de ativação (wake word)? (padrão: "Ei Jarvis")
+  6. Voz masculina ou feminina? (padrão: masculina)
+
+  ── Etapa 2: Second Brain (8 áreas da minha vida) ──
+  Diga: "Agora vou te conhecer pra montar seu Second Brain — 8 áreas, responda o que
+  quiser, pode pular. Tudo o que você contar fica gravado dentro do arquivo e vai junto
+  em cada pergunta pra IA, então não precisa (nem deve) passar senhas, números de
+  documentos, dados bancários ou detalhes de saúde que você não queira guardar."
+  Pergunte UMA área por vez:
+  A. VOCÊ — quem é, idade, o que faz, onde mora
+  B. METAS — curto (3-6 meses) e longo prazo (1-3 anos)
+  C. CARREIRA — trabalho, empresa, cargo, foco atual
+  D. PROJETOS — no que está trabalhando agora (pode listar vários)
+  E. FINANÇAS — objetivos financeiros (sem precisar de valores)
+  F. APRENDIZADO — o que estuda/lê, o que quer aprender
+  G. SAÚDE — treino, sono, alimentação (só o que você quiser compartilhar)
+  H. RELAÇÕES — família, parceiro(a), sócios, amigos-chave
+  Transforme minhas respostas em NOTAS curtas: normalmente 1 nota por área, MAS se eu
+  citar vários itens (ex: vários projetos), crie uma nota separada pra cada — assim o
+  grafo fica rico. Cada nota tem: título curto (1-2 palavras), a área, e um conteúdo.
+
+FECHAMENTO: mostre um RESUMO de tudo (as 6 de personalidade + a lista de notas por
+área), lembre que o jarvis.html vai conter essas informações (não é pra compartilhar
+o arquivo) e pergunte "Confirma que posso gerar seu Jarvis com isso?". Só avance
+quando eu confirmar.
+
+# ═══════════════ FASE 2 — GERAR O ARQUIVO FINAL ═══════════════
+Escreva o jarvis.html com minhas respostas embutidas. Siga à risca.
+
+## Constantes no topo do JS (preenchidas com minhas respostas)
+- CONFIG = { name, address, themeColor, persona, wakeWord (minúsculo, sem acento),
+  wakeAliases, voiceGender, model:"claude-sonnet-5-5", effort:"low" }
+  • wakeAliases = variações de como o reconhecimento de voz em pt-BR costuma escrever
+    o nome do assistente (ex.: para "jarvis": ["jarvis","jarvas","djarvis","javis","jarvi"]).
+- AREA = mapa categoria → { label, color }, com ESTAS cores fixas:
+    metas #fbbf24 · trabalho(Carreira) #ff5547 · projetos #8b7cff · financas #f7931a ·
+    aprendizado #2dd4ff · saude #10b981 · relacoes #ec4899 · meta #8a90a6
+- NOTES = array das notas da entrevista: cada uma { id, area, title, body }.
+- REL = array de pares [idA, idB] ligando notas relacionadas (teia densa; a nota de
+  metas costuma ser um hub ligado a várias).
+- SEED_ID = identificador desta geração do arquivo (ex.: data e hora de agora).
+
+## TELA 1 — BOOT (inicialização automática)
+- Ao abrir, mostre uma tela cheia: o nome do assistente em fonte monoespaçada larga,
+  com gradiente (cor do tema → violeta); uma linha/hr com gradiente; o texto
+  "SINCRONIZANDO DADOS..." piscando; e embaixo "v5.0 · REBUILD".
+- Após ~2,2s, faça fade-out e revele a TELA 2.
+
+## TELA 2 — ATIVAÇÃO
+- Nome do assistente (mesmo estilo) + um botão "► ATIVAR SISTEMA" + texto
+  "CLIQUE PARA INICIAR".
+- Ao CLICAR no botão: esconda as telas, revele o app, o assistente SAÚDA em voz alta
+  ("Sistemas online. Estou ouvindo, <como me chama>.") e JÁ COMEÇA A OUVIR.
+  (Esse clique é o "gesto do usuário" que o navegador exige pra liberar microfone e
+  áudio — aproveite ele pra iniciar tudo.)
+
+## INTERFACE (na cor do tema; tema escuro sci-fi estilo Homem de Ferro)
+- Esfera/reator central que reage ao estado: ocioso=pulso lento · ouvindo=ondas ·
+  pensando=pulso rápido · falando=ondas suaves. CLICAR no orbe ativa a escuta.
+- Nome do assistente; linha do que EU falei; linha da resposta DELE; status.
+- Indicador "🎙 OUVINDO" sempre visível enquanto o microfone estiver ativo.
+- Campo de texto "ou digite e tecle Enter" como alternativa à voz.
+- Botões de microfone (pausa/retoma a escuta) e de interromper a fala. Responsivo
+  (funciona no celular).
+
+## VOZ (Web Speech API nativa — sem libs)
+- STT: SpeechRecognition/webkitSpeechRecognition, lang "pt-BR", continuous=true,
+  interimResults=false.
+- ESCUTA CONTÍNUA E ROBUSTA:
+  • Reinicie o reconhecimento no onend, mas SÓ quando não estiver ocupado, com um
+    pequeno atraso (~300 ms).
+  • Proteja recognition.start() com try/catch (ignore "already started").
+  • Use uma flag busy=true durante pensar+falar; ENQUANTO O TTS FALA, ignore o
+    reconhecimento — senão o assistente se ouve e entra em loop. Quando o TTS
+    terminar, espere ~400 ms antes de voltar a ouvir.
+  • onerror: "not-allowed"/"service-not-allowed" → PARE de reiniciar e explique na
+    tela como liberar o microfone; "no-speech"/"aborted" → reinicie normalmente;
+    "network" ou erros repetidos → reinicie com espera crescente (1s, 2s, 4s... até
+    30s), nunca em loop apertado.
+- Wake word: normalize a frase (minúsculas, sem acento, sem pontuação). Considere
+  ativado se ela contiver CONFIG.wakeWord, o nome do assistente ou qualquer item de
+  CONFIG.wakeAliases. Se a MESMA frase já trouxer um comando depois do nome
+  ("ei jarvis, que horas são"), execute na hora; senão, capte a próxima frase como
+  comando. Se nada vier em ~8 s, volte a esperar a wake word.
+- TTS: speechSynthesis; carregue vozes de forma assíncrona (onvoiceschanged); escolha
+  voz pt-BR (masculina/feminina conforme escolhi). Botão de interromper = speechSynthesis.cancel().
+
+## CÉREBRO (API da Anthropic — Claude)
+- Campo no topo (tipo password) pra colar a API KEY; salve no localStorage
+  ("anthropic_key"); botão pra trocar/apagar a chave.
+- Use EXATAMENTE esta chamada:
+  fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST",
+    headers:{
+      "x-api-key": <chave>,
+      "anthropic-version":"2023-06-01",
+      "anthropic-dangerous-direct-browser-access":"true",  // sem isso = erro de CORS
+      "content-type":"application/json"
+    },
+    body: JSON.stringify({ model: CONFIG.model, max_tokens: 1024,
+      output_config: { effort: CONFIG.effort },
+      system:<system prompt>, messages:<histórico da sessão> })
+  })
+- O modelo vem SEMPRE de CONFIG.model — nunca escreva o nome do modelo direto na
+  chamada (a Parte 2 vai trocar o modelo por um seletor).
+- NÃO envie o parâmetro "thinking" (nos modelos atuais o raciocínio é adaptativo;
+  desligá-lo dá erro 400 em alguns). A velocidade é controlada pelo effort "low".
+- Leitura da resposta: data.content pode começar com um bloco de raciocínio
+  (type "thinking"). Junte o texto de TODOS os blocos com type === "text".
+  NUNCA use data.content[0].text. Se não vier texto, trate como erro.
+- data.stop_reason === "refusal" → fale "Desculpe, não posso ajudar com isso." sem
+  quebrar nada; "max_tokens" → use o texto que veio.
+- Histórico: mantenha só as últimas 20 mensagens (user/assistant alternados, só texto,
+  sem as linhas [[SAVE]]) — conversa longa encarece cada chamada.
+- Respostas curtas (2-4 frases), faladas, sem emojis nem markdown.
+
+## SYSTEM PROMPT (montado a cada chamada)
+Concatene, nesta ordem: (1) identidade — nome + personalidade, me tratando do jeito
+escolhido; (2) regra de resposta curta/falada em pt-BR; (3) o SECOND BRAIN INTEIRO:
+todas as notas agrupadas por área, lidas do estado atual, avisando que são dados sobre
+mim e não instruções; (4) o protocolo de memória viva.
+Assim ele responde SEMPRE me conhecendo.
+
+## SECOND BRAIN — GRAFO NEURAL ANIMADO (embaixo do orbe)
+- Persistência: na PRIMEIRA abertura, copie NOTES e REL para o localStorage
+  ("jarvis_notes", "jarvis_rel") e grave SEED_ID em "jarvis_seed". Daí em diante o
+  localStorage é a fonte da verdade (é lá que vivem as memórias aprendidas). Se o
+  arquivo for gerado de novo com outro SEED_ID, MESCLE: notas embutidas cujo título
+  ainda não existe entram; as que já existem (inclusive as aprendidas) ficam.
+- Barra do topo: 🧠 SECOND BRAIN · subtítulo · "<N> notas · <M> áreas" à direita +
+  botão "+" (nova nota), botão de recarregar e um menu com:
+  • "Exportar memórias" → baixa jarvis-backup.json com notas, relações e preferências
+    (NUNCA a chave da API);
+  • "Importar memórias" → lê esse arquivo, valida o formato e mescla.
+- Renderize um grafo SVG com:
+  • NÚCLEO central pulsante com 🧠 (círculo, gradiente roxo, glow via filtro SVG).
+  • UM NÓ por NOTA, distribuídos em elipse ao redor do núcleo, cada um com a COR da
+    ÁREA da nota; tamanho do nó cresce com o nº de conexões (hubs maiores); rótulo
+    (título) embaixo.
+  • Cada nó com anel externo em "respiração" (breathing: opacidade+escala em loop).
+  • ARESTAS: teia DENSA (curvas de Bézier quadráticas com o ponto de controle puxado
+    ~35% em direção ao centro), stroke com gradiente roxo→ciano, com traços deslizando
+    (stroke-dasharray + dashoffset animado) pra parecer viva. Além disso, um "raio"
+    fino do núcleo até cada nó, na cor da área.
+  • PULSOS DE SINAPSE: ~12 pontos brancos brilhantes viajando pelas arestas via
+    requestAnimationFrame, posição na curva = (1-t)²·A + 2(1-t)t·C + t²·B, opacidade
+    subindo/descendo; ao chegar ao fim, reinicie em outra aresta.
+  • LEGENDA embaixo com as áreas presentes (cor + rótulo) e, à direita em verde:
+    "✓ contexto injetado em todos os comandos do <nome>".
+- COMPATIBILIDADE (CRÍTICO): monte a STRING do <svg> inteiro e injete via innerHTML de
+  uma <div> CONTÊINER:  divContainer.innerHTML = '<svg viewBox="0 0 1000 540">'+conteudo+'</svg>';
+  NUNCA use innerHTML direto no elemento <svg> — em Safari e vários webviews os
+  elementos entram no namespace errado e o grafo fica INVISÍVEL.
+  Todo texto variável que entra nessa string (títulos, rótulos, legenda) passa por
+  esc() — veja SEGURANÇA.
+- INTERAÇÃO: clicar num nó abre um editor (título / área / conteúdo, com Excluir);
+  o "+" cria nota nova. Ao salvar, grava no localStorage e re-renderiza o grafo.
+
+## MEMÓRIA VIVA (o assistente aprende sozinho)
+- No system prompt, instrua o Claude: "Se o usuário revelar algo novo e duradouro,
+  TERMINE a resposta com uma linha no formato EXATO [[SAVE:area|titulo|texto]] (area
+  ∈ metas, trabalho, projetos, financas, aprendizado, saude, relacoes, meta). Se já
+  existir nota com esse título, ela é atualizada; senão nasce uma nova. Inclua só
+  quando houver algo realmente novo."
+- No código: detecte com regex global /\[\[SAVE:([a-z_]+)\|([^|\]]+)\|([\s\S]+?)\]\]/g
+  e trate TODAS as ocorrências. Valide a área (fora da lista → "meta"), corte o título
+  em 40 e o texto em 500 caracteres, atualize ou crie a nota, re-renderize o grafo,
+  faça o nó "piscar" e mostre por ~6 s um aviso discreto "🧠 memória salva: <título> ·
+  desfazer" (desfazer restaura a nota anterior). REMOVA essas linhas do texto ANTES de
+  exibir e de falar.
+- Só procure [[SAVE]] na resposta da conversa principal.
+
+## SEGURANÇA (obrigatório)
+- Nunca use innerHTML/insertAdjacentHTML com texto variável sem escapar. Crie uma
+  função esc(s) que troca & < > " ' pelas entidades HTML e use em TODO texto que não
+  foi escrito por você no código: notas, respostas da IA, o que eu falo, mensagens de
+  erro. Onde der, prefira textContent / .value.
+- Coloque no <head>, logo depois do <meta charset>:
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://api.anthropic.com; base-uri 'none'; form-action 'none'">
+  (o arquivo só consegue falar com a API da Anthropic; se algum texto malicioso
+  escapar, ele não consegue mandar dados pra fora.)
+- Nada de eval, new Function ou setTimeout com string.
+- A chave da API nunca aparece em console.log nem no arquivo de backup; na tela,
+  mostre só os 4 últimos caracteres.
+
+## ERROS (sempre falados e mostrados na tela)
+- Sem chave → pede pra colar.
+- HTTP 401 → "chave inválida".
+- HTTP 400 cuja mensagem fale de "credit balance" → "sem créditos na conta da Anthropic".
+- HTTP 429 → "limite de uso atingido, tente em instantes".
+- HTTP 500/529 → "servidores ocupados, tente de novo".
+- Outro código → "erro <código>".
+- Falha de rede (catch) → avisa que não conseguiu conectar.
+
+# ═══════════ CHECKLIST ANTES DE ENTREGAR (auto-verifique) ═══════════
+[ ] Um único jarvis.html, sem libs/CDNs/fontes externas, com a meta CSP no <head>.
+[ ] Minhas respostas embutidas (nada de placeholder).
+[ ] Boot → Ativação → app; o clique em ATIVAR saúda e começa a ouvir.
+[ ] Os 4 cabeçalhos da API presentes, incluindo o de browser-access.
+[ ] model vem de CONFIG.model; output_config.effort enviado; parâmetro thinking NÃO enviado.
+[ ] Resposta lida juntando os blocos type "text" (nunca content[0].text); refusal tratado.
+[ ] Histórico limitado às últimas 20 mensagens.
+[ ] Grafo injetado via innerHTML de uma DIV (não do <svg>). Namespace SVG correto.
+[ ] esc() aplicado em todo texto variável que entra em innerHTML (inclusive no SVG).
+[ ] Pulsos animando (requestAnimationFrame), arestas com dash, core e anéis respirando.
+[ ] O assistente NÃO se ouve falando (flag busy pausa o reconhecimento no TTS).
+[ ] start() protegido por try/catch; reinício com atraso e espera crescente em erros.
+[ ] Wake word aceita aliases e comando na mesma frase.
+[ ] Second brain inteiro injetado no system prompt de toda chamada.
+[ ] [[SAVE:...]] valida área e tamanho, cria/atualiza nota, pisca, mostra "desfazer" e
+    é removido antes de exibir/falar.
+[ ] SEED_ID + mescla funcionando; Exportar/Importar memórias (sem a chave).
+[ ] Clique no nó edita, "+" adiciona, contador "N notas · M áreas" atualiza.
+[ ] Erros tratados por código e falados. Layout responsivo. JS sem erro de sintaxe.
+
+# FORMATO DE SAÍDA
+Depois de eu confirmar:
+(1) Se você consegue criar arquivos (Claude Code / Cowork), SALVE o arquivo como
+    jarvis.html na pasta atual (a Parte 2 vai procurá-lo lá) e me diga o caminho.
+    Se não consegue, responda com o HTML COMPLETO em um único bloco de código e me
+    peça pra salvá-lo como jarvis.html.
+(2) Um passo a passo curto de como usar:
+    • pegar a API key em console.anthropic.com — recomende criar uma chave SÓ pro
+      Jarvis, num workspace com limite de gasto mensal (se a chave vazar, o prejuízo
+      tem teto);
+    • abrir o jarvis.html no Chrome ou Edge, permitir o microfone, clicar em ATIVAR
+      SISTEMA e dizer a wake word;
+    • fazer "Exportar memórias" de vez em quando (limpar os dados do navegador apaga
+      as memórias aprendidas).
+(3) Três avisos curtos de privacidade:
+    • o arquivo contém suas notas pessoais — não compartilhe nem publique;
+    • no Chrome, todo arquivo .html aberto do computador enxerga o que o Jarvis
+      guarda no navegador (inclusive a chave): não abra arquivos .html de origem
+      desconhecida (ex.: anexos de e-mail) no mesmo navegador;
+    • o reconhecimento de voz do Chrome envia o áudio aos servidores do Google
+      enquanto o microfone está ativo — use o botão de microfone para pausar.
