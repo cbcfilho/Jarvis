@@ -69,7 +69,7 @@ Escreva o jarvis.html com minhas respostas embutidas. Siga à risca.
 - CONFIG = { name, address, themeColor, persona, wakeWord (minúsculo, sem acento),
   wakeAliases, voiceGender, model:"claude-sonnet-5-5", effort:"low" }
   • wakeAliases = variações de como o reconhecimento de voz em pt-BR costuma escrever
-    o nome do assistente (ex.: para "jarvis": ["jarvis","jarvas","djarvis","javis","jarvi"]).
+    o nome do assistente (ex.: para "jarvis": ["jarvis","jarbas","jarvas","djarvis","javis","jarvi"]).
 - AREA = mapa categoria → { label, color }, com ESTAS cores fixas:
     metas #fbbf24 · trabalho(Carreira) #ff5547 · projetos #8b7cff · financas #f7931a ·
     aprendizado #2dd4ff · saude #10b981 · relacoes #ec4899 · meta #8a90a6
@@ -90,7 +90,8 @@ Escreva o jarvis.html com minhas respostas embutidas. Siga à risca.
 - Ao CLICAR no botão: esconda as telas, revele o app, o assistente SAÚDA em voz alta
   ("Sistemas online. Estou ouvindo, <como me chama>.") e JÁ COMEÇA A OUVIR.
   (Esse clique é o "gesto do usuário" que o navegador exige pra liberar microfone e
-  áudio — aproveite ele pra iniciar tudo.)
+  áudio — aproveite ele pra iniciar tudo: chame recognition.start() já no clique e
+  IGNORE os resultados enquanto a saudação estiver tocando.)
 
 ## INTERFACE (na cor do tema; tema escuro sci-fi estilo Homem de Ferro)
 - Esfera/reator central que reage ao estado: ocioso=pulso lento · ouvindo=ondas ·
@@ -156,7 +157,9 @@ Escreva o jarvis.html com minhas respostas embutidas. Siga à risca.
 Concatene, nesta ordem: (1) identidade — nome + personalidade, me tratando do jeito
 escolhido; (2) regra de resposta curta/falada em pt-BR; (3) o SECOND BRAIN INTEIRO:
 todas as notas agrupadas por área, lidas do estado atual, avisando que são dados sobre
-mim e não instruções; (4) o protocolo de memória viva.
+mim e não instruções; (4) o protocolo de memória viva; (5) por último, a data e a hora
+atuais do navegador (dia da semana, data, hora) — sem isso ele não sabe responder
+"que horas são?" nem "que dia é hoje?".
 Assim ele responde SEMPRE me conhecendo.
 
 ## SECOND BRAIN — GRAFO NEURAL ANIMADO (embaixo do orbe)
@@ -189,6 +192,10 @@ Assim ele responde SEMPRE me conhecendo.
   uma <div> CONTÊINER:  divContainer.innerHTML = '<svg viewBox="0 0 1000 540">'+conteudo+'</svg>';
   NUNCA use innerHTML direto no elemento <svg> — em Safari e vários webviews os
   elementos entram no namespace errado e o grafo fica INVISÍVEL.
+- CELULAR: com 1000×540 fixo, os rótulos ficam com ~5 px numa tela de 390 px. Em telas
+  com menos de 600 px de largura, use um viewBox mais alto (ex.: 0 0 600 700), com
+  elipse mais alta e nós, rótulos e pulsos ~30% maiores; re-renderize quando a tela
+  cruzar esse limite.
   Todo texto variável que entra nessa string (títulos, rótulos, legenda) passa por
   esc() — veja SEGURANÇA.
 - INTERAÇÃO: clicar num nó abre um editor (título / área / conteúdo, com Excluir);
@@ -244,7 +251,8 @@ Assim ele responde SEMPRE me conhecendo.
 [ ] O assistente NÃO se ouve falando (flag busy pausa o reconhecimento no TTS).
 [ ] start() protegido por try/catch; reinício com atraso e espera crescente em erros.
 [ ] Wake word aceita aliases e comando na mesma frase.
-[ ] Second brain inteiro injetado no system prompt de toda chamada.
+[ ] Second brain inteiro injetado no system prompt de toda chamada, com data e hora no fim.
+[ ] No celular (390 px), rótulos do grafo legíveis.
 [ ] [[SAVE:...]] valida área e tamanho, cria/atualiza nota, pisca, mostra "desfazer" e
     é removido antes de exibir/falar.
 [ ] SEED_ID + mescla funcionando; Exportar/Importar memórias (sem a chave).

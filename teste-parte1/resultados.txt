@@ -1,0 +1,71 @@
+PASS  Boot: tela cheia com nome, "SINCRONIZANDO DADOS..." e "v5.0 · REBUILD"
+PASS  Boot: tela de ativação ainda escondida antes de 2,2 s
+PASS  Ativação aparece após ~2,2 s com "► ATIVAR SISTEMA" e "CLIQUE PARA INICIAR"
+PASS  Clique em ATIVAR: saúda em voz alta  — Sistemas online. | Estou ouvindo, senhor.
+PASS  Clique em ATIVAR: já começa a ouvir (pt-BR, continuous, sem interim)  — {"lang":"pt-BR","c":true,"i":false,"started":true}
+PASS  Voz masculina pt-BR escolhida  — Daniel
+PASS  Indicador "🎙 OUVINDO" visível com microfone ativo
+PASS  Grafo injetado via innerHTML de uma DIV, namespace SVG correto
+PASS  11 nós, 16 arestas, 11 raios, 12 pulsos, SVG com altura > 0  — {"n":11,"e":16,"r":11,"p":12,"h":576}
+PASS  Arestas são Bézier quadráticas (Q)  — M713.6 102.2 Q686.2 184.4 859.3 183.1
+PASS  Animações: dash nas arestas, respiração nos anéis, pulso no núcleo  — dash,breath,pulse
+PASS  Pulsos de sinapse se movendo (requestAnimationFrame)
+PASS  Contador "11 notas · 8 áreas"  — 11 notas · 8 áreas
+PASS  Legenda com áreas e "✓ contexto injetado em todos os comandos do JARVIS/Jarvis"  — MetasCarreiraProjetosFinançasAprendizadoSaúdeRelaçõesVocê✓ contexto injetado em todos os comandos do Jarvis
+PASS  Primeira abertura: notas, relações e SEED_ID salvos no localStorage  — {"n":11,"seed":"2026-10-12T16:00","rel":16}
+PASS  Sem chave: pede para colar, sem chamar a API  — Preciso da sua chave da API para pensar, senhor. Cole no campo lá em cima.
+PASS  Chave salva: campo some, mostra só os 4 últimos caracteres  — chave salva ••••1234
+PASS  Wake word por alias ("Jarbas") + comando na mesma frase  — comecei a estudar japonês
+PASS  4 cabeçalhos da API presentes (incl. browser-access)
+PASS  Corpo: model de CONFIG (claude-sonnet-5-5), max_tokens 1024, effort low, SEM thinking  — {"m":"claude-sonnet-5-5","t":1024,"o":{"effort":"low"},"th":false}
+PASS  System prompt: identidade, regra curta, Second Brain inteiro (dados, não instruções), protocolo SAVE
+PASS  System prompt termina com data e hora atuais  — AGORA: segunda-feira, 12 de outubro de 2026 às 17:11 (horário local do usuário).
+PASS  Resposta lida mesmo com bloco "thinking" primeiro  — Excelente iniciativa, senhor. Japonês combina com seus planos de viagem com a Ana.
+PASS  [[SAVE]] removido antes de exibir e de falar
+PASS  Durante a fala o reconhecimento é pausado (abort) e a frase com wake word é ignorada  — {"busy":true,"started":false,"abortLogged":true} ignored=false reqs=1
+PASS  Memória viva: nota "Japonês" criada em aprendizado, grafo com 12 nós, contador atualizado  — {"note":{"id":"nmv5ieezvatdm","area":"aprendizado","title":"Japonês","body":"Começou a estudar japonês para viajar com a Ana."},"nodes":12,"toast":"🧠 memória salva: Japonês","undo":true,"blink":1,"count":"12 notas · 8 áreas"}
+PASS  Memória viva: nó pisca e aviso "🧠 memória salva: Japonês · desfazer"
+PASS  Após a fala, o reconhecimento volta sozinho (~400 ms)  — {"started":true,"starts":3}
+PASS  "desfazer" restaura o estado anterior  — {"has":false,"nodes":11}
+PASS  XSS: título/resposta maliciosos não executam e aparecem como texto  — {"pwned":[null,null,null],"imgs":0,"label":"<img src=x onerror=window.__pwned=1>","reply":"Feito <b>negrito</b><img src=x onerror=\"window.__pwned2=1\">, senhor."}
+PASS  Editor: Excluir remove a nota
+PASS  Frase sem wake word é ignorada
+PASS  Só a wake word: fica acordado esperando o comando (estado "ouvindo")  — {"awake":true,"state":"listening","status":"Pois não, senhor?"}
+PASS  Próxima frase vira comando
+PASS  Sem comando em ~8 s, volta a esperar a wake word
+PASS  Erro 401: mensagem certa, mostrada e falada  — Sua chave da API parece inválida, senhor. Confira e cole de novo.
+PASS  Erro 400 crédito: mensagem certa, mostrada e falada  — Sua conta da Anthropic está sem créditos, senhor.
+PASS  Erro 429: mensagem certa, mostrada e falada  — Atingimos o limite de uso, senhor. Tente de novo em instantes.
+PASS  Erro 529: mensagem certa, mostrada e falada  — Os servidores estão ocupados, senhor. Tente de novo em instantes.
+PASS  Erro 404 (outro): mensagem certa, mostrada e falada  — Recebi o erro 404 da API, senhor.
+PASS  Erro rede: mensagem certa, mostrada e falada  — Não consegui me conectar aos servidores, senhor. Verifique sua internet.
+PASS  Erro refusal: mensagem certa, mostrada e falada  — Desculpe, não posso ajudar com isso.
+PASS  Erro resposta vazia: mensagem certa, mostrada e falada  — Recebi uma resposta vazia, senhor. Tente de novo.
+PASS  Após erros, o histórico continua alternando user/assistant (falhas não ficam penduradas)  — uauauau
+PASS  max_tokens: usa o texto que veio e não fala a tag cortada  — Certo, senhor. Vou lembrar disso.
+PASS  Histórico limitado às últimas 20 mensagens, começando por user  — enviadas: 19
+PASS  Interromper: para a fala e libera o Jarvis  — {"busy":false,"speakingNow":false,"state":"idle"}
+PASS  Erro de rede no reconhecimento: reinicia com espera crescente (~1 s, depois ~2 s)  — starts=2 log=start,start
+PASS  …e não entra em loop apertado  — intervalo entre reinícios ≈ 2303 ms
+PASS  Microfone negado (not-allowed): para de reiniciar e explica na tela  — {"started":false,"status":"Microfone bloqueado. Clique no ícone ao lado do endereço, permita o microfone e recarregue a página. Você ainda pode digitar.","live":"● MICROFONE BLOQUEADO"}
+PASS  Botão de microfone retoma a escuta
+PASS  Botão de microfone pausa a escuta
+PASS  Clicar no orbe ativa a escuta (estado ouvindo)
+PASS  Clique no nó abre o editor com os dados da nota
+PASS  Editar salva no localStorage
+PASS  "+" cria nota nova, ligada no grafo, contador atualiza  — {"nodes":12,"count":"12 notas · 8 áreas","linked":true}
+PASS  Exportar: baixa jarvis-backup.json com notas e relações
+PASS  Exportar: backup NÃO contém a chave da API
+PASS  Importar: mescla (2 novas, 1 atualizada), valida a área  — Memórias importadas: 2 novas, 1 atualizadas.
+PASS  Importar arquivo inválido: avisa sem quebrar
+PASS  Novo SEED_ID: notas embutidas entram, aprendidas ficam (sem duplicar título)  — notas=12 rel=16
+PASS  Mesmo SEED_ID: recarregar não mexe nas notas
+PASS  CSP: tentar mandar dados para outro site é bloqueado  — ["connect-src https://evil.example/roubar?x=1"]
+PASS  Nenhuma requisição para fora além da API (rede)
+PASS  Mobile (390 px): sem rolagem horizontal  — {"sw":390,"w":390}
+PASS  Mobile: rótulos do grafo legíveis (≥ 11 px na tela)  — 18 px
+PASS  Redimensionar para tela larga troca o layout do grafo  — {"narrow":false,"vb":"0 0 1000 540"}
+PASS  Nenhuma violação de CSP inesperada
+PASS  Nenhum erro de JavaScript (exceções) durante todos os testes  — 8 logs de rede esperados ignorados
+
+69/69 testes passaram.
