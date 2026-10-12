@@ -1,0 +1,72 @@
+PASS  Código: não usa data.content[0].text
+PASS  Código: sem eval / new Function
+PASS  Código: sem CDN/fonte externa (<script src>/<link href http>)
+PASS  Código: modelo claude-sonnet-5-5 e effort "low" em CONFIG
+PASS  Código: função esc() presente
+PASS  Boot: "SINCRONIZANDO DADOS..." e "v5.0 · REBUILD" visíveis  — JARVIS SINCRONIZANDO DADOS... v5.0 · REBUILD
+PASS  CSP exatamente como pedido, logo depois do <meta charset>  — {"content":"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://api.anthropic.com; base-uri 'none'; form-action 'none'","right":true}
+PASS  Ativação ainda não aparece com ~1,3 s
+PASS  Ativação aparece (~2,2 s) com "► ATIVAR SISTEMA" e "CLIQUE PARA INICIAR"
+PASS  Clique em ATIVAR: saúda "Sistemas online. Estou ouvindo, senhor."  — Sistemas online. Estou ouvindo, senhor.
+PASS  Clique em ATIVAR: reconhecimento iniciado (pt-BR, continuous, sem interim)  — [{"lang":"pt-BR","c":true,"i":false,"st":true}]
+PASS  Voz masculina pt-BR escolhida  — Daniel
+PASS  Indicador "OUVINDO" visível com microfone ativo
+PASS  Grafo: <svg> dentro de uma DIV, namespace SVG correto, visível  — {"p":"DIV","h":576}
+PASS  Grafo: um nó (com rótulo) por nota e núcleo 🧠  — notas=12
+PASS  Grafo: arestas Bézier quadráticas, pelo menos uma por relação  — arestas=25 relações=25
+PASS  localStorage: jarvis_notes, jarvis_rel e jarvis_seed gravados na 1ª abertura  — seed=2026-10-12T18:24Z
+PASS  Pulsos de sinapse se movendo (≥ 8 pontos mudaram de posição)  — 12 círculos se moveram
+PASS  Arestas com traço deslizando (dasharray + dashoffset mudando)  — 5px, 9px | -17.664px → -29.664px
+PASS  Contador "N notas · M áreas" correto  — 12 notas · 8 áreas
+PASS  Legenda: "✓ contexto injetado em todos os comandos do Jarvis"
+PASS  Sem chave: pede para colar (falado), sem chamar a API  — Preciso da sua chave da API da Anthropic, senhor. Cole-a no campo do topo da tela.
+PASS  Campo da chave é do tipo password
+PASS  Chave salva em localStorage "anthropic_key"
+PASS  Tela mostra só os 4 últimos caracteres da chave  — 🔑 chave ••••9876
+PASS  Wake word por alias "Jarbas" + comando na mesma frase  — comecei a estudar japonês
+PASS  4 cabeçalhos da API
+PASS  Corpo: model claude-sonnet-5-5, max_tokens 1024, output_config.effort low, SEM thinking  — {"m":"claude-sonnet-5-5","t":1024,"o":{"effort":"low"},"th":false}
+PASS  System prompt: Second Brain inteiro + protocolo [[SAVE]]  — Você é Jarvis, o assistente pessoal de voz do usuário. Personalidade: mordomo britânico formal: cortês, impecável, preci
+PASS  System prompt termina com data e hora atuais  —  uma nova. Inclua só quando houver algo realmente novo. Use títulos curtos (1 a 2 palavras) e, para atualizar uma nota, repita o título exato dela e escreva o texto completo atualizado.
+
+Agora é segunda-feira, 12 de outubro de 2026, 18:38 (fuso UTC).
+PASS  Resposta lida mesmo com bloco "thinking" primeiro
+PASS  [[SAVE]] some da tela e da fala
+PASS  Não se ouve falando: frase com wake word durante a fala não vira comando  — microfone ligado, resultado ignorado · reqs=1
+PASS  Memória viva: nota "Japonês" criada na área aprendizado  — {"id":"nmv5lho0e2tt0g","area":"aprendizado","title":"Japonês","body":"Começou a estudar japonês para viajar com a Ana."}
+PASS  Memória viva: aviso "memória salva" com "desfazer"
+PASS  Depois da fala, volta a ouvir sozinho
+PASS  "desfazer" remove a memória recém-salva  — clicou=true
+PASS  XSS: título e resposta maliciosos não executam (aparecem como texto)  — {"p":[null,null,null],"imgs":0,"label":true}
+PASS  Clique no nó abre o editor com o título da nota
+PASS  Editor: Excluir remove a nota
+PASS  Editor: salvar grava no localStorage
+PASS  "+" cria nota nova e o contador atualiza  — notas=13
+PASS  Frase sem wake word é ignorada
+PASS  Só a wake word → a próxima frase vira comando  — que horas são
+PASS  Erro 401: mostrado e falado  — Chave inválida. Confira a chave da API no topo da tela, senhor.
+PASS  Erro 400 crédito: mostrado e falado  — Sem créditos na conta da Anthropic, senhor.
+PASS  Erro 429: mostrado e falado  — Limite de uso atingido, tente em instantes.
+PASS  Erro 529: mostrado e falado  — Servidores ocupados, tente de novo.
+PASS  Erro 404 (outro): mostrado e falado  — Erro 404.
+PASS  Erro rede: mostrado e falado  — Não consegui me conectar aos servidores da Anthropic. Verifique sua internet, senhor.
+PASS  Erro refusal: mostrado e falado  — Desculpe, não posso ajudar com isso.
+PASS  Erro resposta vazia: mostrado e falado  — A resposta veio sem texto. Tente de novo, senhor.
+PASS  Depois dos erros o histórico segue alternando user/assistant  — uauauauau
+PASS  max_tokens: usa o texto que veio e não fala a tag cortada  — Certo, senhor. Vou lembrar disso.
+PASS  Histórico limitado a 20 mensagens, começando por user  — enviadas=19
+PASS  Botão interromper corta a fala  — clicou=true
+PASS  Erro de rede: reinicia com espera crescente (sem loop apertado)  — esperas ≈ 1010 ms, 2017 ms
+PASS  Microfone negado: para de reiniciar e explica na tela
+PASS  Exportar: baixa jarvis-backup.json com as notas  — jarvis-backup.json
+PASS  Exportar: backup NÃO contém a chave
+PASS  Importar: mescla nota nova e valida a área (inválida → meta)  — {"id":"imp1","area":"meta","title":"Podcast","body":"Lançar um podcast."}
+PASS  Importar arquivo inválido não quebra a página
+PASS  Novo SEED_ID: embutidas entram, aprendidas ficam, sem duplicar título  — notas=13
+PASS  CSP bloqueia envio para outro site  — ["connect-src https://evil.example/x"]
+PASS  Nenhuma requisição de rede para fora da API
+PASS  Celular (390 px): sem rolagem horizontal  — {"sw":390,"w":390,"label":12}
+PASS  Celular: rótulos do grafo legíveis (≥ 11 px)  — 12 px
+PASS  Nenhuma exceção de JavaScript
+
+68 PASS · 0 FAIL · 0 SKIP (de 68)

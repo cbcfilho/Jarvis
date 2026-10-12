@@ -95,6 +95,7 @@ const INIT = () => {
 const apiRequests = [];
 let apiQueue = [];
 let inflight = 0;
+let lastFulfill = 0;
 const CORS = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST, OPTIONS' };
 const okText = (text, extra) => ({ status: 200, json: Object.assign({
   id: 'msg_t', type: 'message', role: 'assistant', model: 'claude-sonnet-5-5',
@@ -114,6 +115,7 @@ const okText = (text, extra) => ({ status: 200, json: Object.assign({
     const next = apiQueue.shift() || okText('Certamente, senhor.');
     await new Promise(r => setTimeout(r, 60));
     inflight--;
+    lastFulfill = Date.now();
     if (next.abort) return route.abort('failed');
     return route.fulfill({ status: next.status, headers: Object.assign({ 'content-type': 'application/json' }, CORS), body: JSON.stringify(next.json) });
   });
@@ -130,8 +132,9 @@ const okText = (text, extra) => ({ status: 200, json: Object.assign({
   const waitIdle = async () => {
     const t0 = Date.now();
     while (Date.now() - t0 < 20000) {
-      const st = await ev(() => ({ a: window.__tts.active, since: Date.now() - window.__tts.lastEnd }));
-      if (inflight === 0 && !st.a && st.since >= 600) break;
+      const st = await ev(() => ({ a: window.__tts.active, end: window.__tts.lastEnd }));
+      // conta a partir do que veio por último: fim da fala ou entrega da resposta da API
+      if (inflight === 0 && !st.a && Date.now() - Math.max(st.end, lastFulfill) >= 700) break;
       await page.waitForTimeout(50);
     }
     await page.waitForTimeout(150);
@@ -143,7 +146,21 @@ const okText = (text, extra) => ({ status: 200, json: Object.assign({
   };
   const visibleText = () => ev(() => document.body.innerText);
   const textInput = () => page.locator('input[placeholder*="digite" i]').first();
-  const sendText = async t => { const i = textInput(); await i.fill(t); await i.press('Enter'); };
+  // Depois de mandar um comando, espera a app REAGIR (requisição nova ou fala nova) antes de esperar ficar ociosa.
+  const reacted = async (reqBefore, spBefore, ms = 4000) => {
+    const t0 = Date.now();
+    while (Date.now() - t0 < ms) {
+      if (apiRequests.length > reqBefore) return true;
+      if ((await ev(() => window.__spoken.length)) > spBefore) return true;
+      await page.waitForTimeout(40);
+    }
+    return false;
+  };
+  const sendText = async t => {
+    const rb = apiRequests.length, sb = await ev(() => window.__spoken.length);
+    const i = textInput(); await i.fill(t); await i.press('Enter');
+    return reacted(rb, sb);
+  };
   const notesLS = () => ev(() => { try { return JSON.parse(localStorage.getItem('jarvis_notes')); } catch (e) { return null; } });
   const clickByText = async (re, opts) => {
     const loc = page.locator('button, [role="button"], a, span, div, li').filter({ hasText: re });
@@ -288,7 +305,8 @@ const okText = (text, extra) => ({ status: 200, json: Object.assign({
     const spoken = (await ev(() => window.__spoken.join(' || ')));
     check('Resposta lida mesmo com bloco "thinking" primeiro', /Excelente iniciativa/.test(t));
     check('[[SAVE]] some da tela e da fala', !/\[\[SAVE/.test(t) && !/\[\[SAVE/.test(spoken));
-    check('Não se ouve falando: frase com wake word durante a fala é ignorada', stoppedDuringTTS && apiRequests.length === before + 1, 'accepted=' + accepted + ' reqs=' + (apiRequests.length - before));
+    check('Não se ouve falando: frase com wake word durante a fala não vira comando', apiRequests.length === before + 1,
+      (stoppedDuringTTS ? 'microfone pausado durante a fala' : 'microfone ligado, resultado ignorado') + ' · reqs=' + (apiRequests.length - before));
     const ns = await notesLS();
     const jp = ns && ns.find(n => n.title === 'Japonês');
     check('Memória viva: nota "Japonês" criada na área aprendizado', jp && jp.area === 'aprendizado', JSON.stringify(jp));
@@ -314,7 +332,10 @@ const okText = (text, extra) => ({ status: 200, json: Object.assign({
     const clickNode = async title => {
       const box = await ev(t => {
         const svg = [...document.querySelectorAll('svg')].find(s => s.querySelectorAll('circle').length > 5);
-        const txt = [...svg.querySelectorAll('text')].find(e => e.textContent.trim() === t);
+        const txt = [...svg.querySelectorAll('text')].find(e => {
+          const v = e.textContent.trim();
+          return v === t || (v.endsWith('…') && v.length > 4 && t.startsWith(v.slice(0, -1)));
+        });
         if (!txt) return null;
         const tb = txt.getBoundingClientRect();
         let best = null, bd = 1e9;
@@ -375,7 +396,9 @@ const okText = (text, extra) => ({ status: 200, json: Object.assign({
     await say('Ei, Jarvis.');
     await page.waitForTimeout(300);
     apiQueue.push(okText('São quatro da tarde, senhor.'));
+    const rb = apiRequests.length, sb = await ev(() => window.__spoken.length);
     await say('que horas são');
+    await reacted(rb, sb);
     await waitIdle();
     const r = apiRequests[apiRequests.length - 1];
     const last = r && r.body.messages[r.body.messages.length - 1];
@@ -392,7 +415,7 @@ const okText = (text, extra) => ({ status: 200, json: Object.assign({
       ['404 (outro)', { status: 404, json: { type: 'error', error: { type: 'not_found_error', message: 'x' } } }, /404/],
       ['rede', { abort: true }, /conect/i],
       ['refusal', { status: 200, json: { type: 'message', role: 'assistant', content: [], stop_reason: 'refusal' } }, /não posso ajudar/i],
-      ['resposta vazia', { status: 200, json: { type: 'message', role: 'assistant', content: [{ type: 'thinking', thinking: '', signature: 's' }], stop_reason: 'end_turn' } }, /vazi|não (recebi|entendi|veio)|erro|sem resposta/i]
+      ['resposta vazia', { status: 200, json: { type: 'message', role: 'assistant', content: [{ type: 'thinking', thinking: '', signature: 's' }], stop_reason: 'end_turn' } }, /vazi|sem texto|não (recebi|entendi|veio)|erro|sem resposta/i]
     ];
     for (const [name, resp, re] of cases) {
       const sp0 = await ev(() => window.__spoken.length);

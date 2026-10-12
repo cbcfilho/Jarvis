@@ -98,7 +98,9 @@ Escreva o jarvis.html com minhas respostas embutidas. Siga à risca.
   pensando=pulso rápido · falando=ondas suaves. CLICAR no orbe ativa a escuta.
 - Nome do assistente; linha do que EU falei; linha da resposta DELE; status.
 - Indicador "🎙 OUVINDO" sempre visível enquanto o microfone estiver ativo.
-- Campo de texto "ou digite e tecle Enter" como alternativa à voz.
+- Campo de texto "ou digite e tecle Enter" como alternativa à voz. Se eu mandar algo
+  enquanto ele ainda está pensando ou falando, não descarte em silêncio: mostre
+  "um momento..." (o texto continua no campo pra eu reenviar).
 - Botões de microfone (pausa/retoma a escuta) e de interromper a fala. Responsivo
   (funciona no celular).
 
